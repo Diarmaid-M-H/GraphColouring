@@ -39,18 +39,26 @@ def detect_conflicts(G):
 
 
 def resolve_conflicts(G, g_used_colors, reserve_colors):
+    # At start of iteration create copy graph to ensure synchronicity
+    copy = G.copy()
+
     for node in G.nodes():
         if G.nodes[node]['flag']:
-            node_color = G.nodes[node]['color']
-            neighbor_colors = {G.nodes[neighbor]['color'] for neighbor in G.neighbors(node)}
+            neighbor_colors = {copy.nodes[neighbor]['color'] for neighbor in copy.neighbors(node)}
             available_colors = [color for color in g_used_colors if color not in neighbor_colors]
-            if not available_colors:  # checks if none available
+            #print('Available: ' + str(available_colors))
+            # TODO only checking when list is empty leads to loops, what's best solution?
+            if not available_colors:  # if empty
                 new_color = reserve_colors.pop()
+                print('New color: ' + new_color)
                 g_used_colors.append(new_color)
-                G.nodes[node]['color'] = new_color
-            else:
-                G.nodes[node]['color'] = available_colors[0]
+                G.nodes[node]['color'] = new_color  # only G, not copy is written to
+            elif random.random() < 0.5:  # this was changed to be random
+                G.nodes[node]['color'] = random.choice(available_colors)
+
+            # Because the alg is synchronous and detect conflicts will be called not sure if this is necessary
             G.nodes[node]['flag'] = False
+            copy.nodes[node]['flag'] = False
 
 
 def draw_graph(G, pos, iteration):
@@ -60,8 +68,8 @@ def draw_graph(G, pos, iteration):
 
 
 def main():
-    num_nodes = 50
-    num_edges = 40
+    num_nodes = 20
+    num_edges = 10
     g_used_colors = ['#fc5185', '#36486b']  # Initial list of colors
     reserve_colors = [
         '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd',
