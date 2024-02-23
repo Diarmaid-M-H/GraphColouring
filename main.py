@@ -68,8 +68,8 @@ def draw_graph(G, pos, iteration):
 
 
 def main():
-    num_nodes = 20
-    num_edges = 10
+    num_nodes = 50
+    num_edges = 20
     g_used_colors = ['#fc5185', '#36486b']  # Initial list of colors
     reserve_colors = [
         '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd',
@@ -91,6 +91,10 @@ def main():
     # Generate node positions with spring layout once
     pos = nx.spring_layout(random_graph)
 
+    # Figure to compare against:
+    estimate = max(nx.greedy_color(random_graph).values()) + 1
+    print('Minimum Colors: ' + str(estimate))
+
     while conflicts > 0:
         print(f"Iteration {iteration}: Number of conflicts: {conflicts}")
         draw_graph(random_graph, pos, iteration)
@@ -98,7 +102,7 @@ def main():
         conflicts = detect_conflicts(random_graph)
         iteration += 1
 
-    print("Conflict resolution complete.")
+    print('Used Colors: ' + str(len(g_used_colors)))
     draw_graph(random_graph, pos, "Final")
 
 
