@@ -2,7 +2,6 @@ import networkx as nx
 import random
 import matplotlib.pyplot as plt
 
-
 def generate_connected_random_graph(num_nodes, num_edges, colors):
     # Ensure the graph is connected using Watts-Strogatz model
     k = 4  # Number of nearest neighbors for each node in the Watts-Strogatz model
@@ -23,7 +22,6 @@ def generate_connected_random_graph(num_nodes, num_edges, colors):
 
     return G
 
-
 def detect_conflicts(G):
     conflicts = 0
     for node in G.nodes():
@@ -37,7 +35,6 @@ def detect_conflicts(G):
             G.nodes[node]['flag'] = False
     return conflicts
 
-
 def resolve_conflicts(G, g_used_colors, reserve_colors):
     # At start of iteration create copy graph to ensure synchronicity
     copy = G.copy()
@@ -46,11 +43,8 @@ def resolve_conflicts(G, g_used_colors, reserve_colors):
         if G.nodes[node]['flag']:
             neighbor_colors = {copy.nodes[neighbor]['color'] for neighbor in copy.neighbors(node)}
             available_colors = [color for color in g_used_colors if color not in neighbor_colors]
-            #print('Available: ' + str(available_colors))
-            # TODO only checking when list is empty leads to loops, what's best solution?
             if not available_colors:  # if empty
                 new_color = reserve_colors.pop()
-                print('New color: ' + new_color)
                 g_used_colors.append(new_color)
                 G.nodes[node]['color'] = new_color  # only G, not copy is written to
             elif random.random() < 0.5:  # this was changed to be random
@@ -60,12 +54,10 @@ def resolve_conflicts(G, g_used_colors, reserve_colors):
             G.nodes[node]['flag'] = False
             copy.nodes[node]['flag'] = False
 
-
 def draw_graph(G, pos, iteration):
     plt.title(f"Iteration {iteration}: Graph")
     nx.draw(G, pos, with_labels=True, node_color=[G.nodes[node]['color'] for node in G.nodes()])
     plt.show()
-
 
 def main():
     num_nodes = 50
@@ -84,26 +76,44 @@ def main():
         '#f7f4a3', '#36486b', '#3fc1c9'
     ]  # List of reserve colors
 
-    random_graph = generate_connected_random_graph(num_nodes, num_edges, g_used_colors)
-    conflicts = detect_conflicts(random_graph)
-    iteration = 1
+    num_graphs = 10
+    estimates = []
+    used_colors_lengths = []
+    iterations = []
 
-    # Generate node positions with spring layout once
-    pos = nx.spring_layout(random_graph)
-
-    # Figure to compare against:
-    estimate = max(nx.greedy_color(random_graph).values()) + 1
-    print('Minimum Colors: ' + str(estimate))
-
-    while conflicts > 0:
-        print(f"Iteration {iteration}: Number of conflicts: {conflicts}")
-        draw_graph(random_graph, pos, iteration)
-        resolve_conflicts(random_graph, g_used_colors, reserve_colors)
+    for _ in range(num_graphs):
+        random_graph = generate_connected_random_graph(num_nodes, num_edges, g_used_colors)
         conflicts = detect_conflicts(random_graph)
-        iteration += 1
+        iteration = 1
 
-    print('Used Colors: ' + str(len(g_used_colors)))
-    draw_graph(random_graph, pos, "Final")
+        # Generate node positions with spring layout once
+        pos = nx.spring_layout(random_graph)
+
+        # Figure to compare against:
+        estimate = max(nx.greedy_color(random_graph).values()) + 1
+        #print('Minimum Colors: ' + str(estimate))
+
+        while conflicts > 0:
+            # draw_graph(random_graph, pos, iteration)  # edit here to start drawing graphs ******
+            resolve_conflicts(random_graph, g_used_colors, reserve_colors)
+            conflicts = detect_conflicts(random_graph)
+            iteration += 1
+
+        used_colors_lengths.append(len(g_used_colors))
+        estimates.append(estimate)
+        iterations.append(iteration)
+
+    print('Estimates:   ', estimates)
+    print('Used Colors: ', used_colors_lengths)
+    print('Iterations:  ', iterations)
+
+    # Calculate averages
+    avg_estimate = sum(estimates) / num_graphs
+    avg_used_colors_length = sum(used_colors_lengths) / num_graphs
+    avg_iterations = sum(iterations) / num_graphs
+    print('Average Minimum Colors:     ', avg_estimate)
+    print('Average Number Used Colors: ', avg_used_colors_length)
+    print('Average Iterations:         ', avg_iterations)
 
 
 if __name__ == "__main__":
