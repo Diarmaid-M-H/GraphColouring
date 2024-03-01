@@ -38,17 +38,21 @@ def detect_conflicts(G):
 def resolve_conflicts(G, g_used_colors, reserve_colors):
     # At start of iteration create copy graph to ensure synchronicity
     copy = G.copy()
-
+    colour_introduction_chance = 0.001
+    colour_change_chance = 0.5
     for node in G.nodes():
         if G.nodes[node]['flag']:
-            neighbor_colors = {copy.nodes[neighbor]['color'] for neighbor in copy.neighbors(node)}
+            neighbor_colors = [copy.nodes[neighbor]['color'] for neighbor in copy.neighbors(node)]
             available_colors = [color for color in g_used_colors if color not in neighbor_colors]
-            if not available_colors:  # if empty
+            if not available_colors and random.random() < colour_introduction_chance:  #COLOUR INTRODUCTION CHANCE # if empty
                 new_color = reserve_colors.pop()
                 g_used_colors.append(new_color)
                 G.nodes[node]['color'] = new_color  # only G, not copy is written to
-            elif random.random() < 0.5:  # this was changed to be random
-                G.nodes[node]['color'] = random.choice(available_colors)
+            elif random.random() < colour_change_chance:  # COLOUR CHANGE CHANCE # this was changed to be random
+                if len(available_colors) > 0:
+                    G.nodes[node]['color'] = random.choice(available_colors)
+                else:
+                    G.nodes[node]['color'] = random.choice(neighbor_colors)
 
             # Because the alg is synchronous and detect conflicts will be called not sure if this is necessary
             G.nodes[node]['flag'] = False
@@ -62,6 +66,8 @@ def draw_graph(G, pos, iteration):
 def main():
     num_nodes = 50
     num_edges = 20
+    num_graphs = 20
+
     g_used_colors = ['#fc5185', '#36486b']  # Initial list of colors
     reserve_colors = [
         '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd',
@@ -75,8 +81,6 @@ def main():
         '#3d4b52', '#5bc0eb', '#fde74c', '#9bc53d', '#c3423f',
         '#f7f4a3', '#36486b', '#3fc1c9'
     ]  # List of reserve colors
-
-    num_graphs = 10
     estimates = []
     used_colors_lengths = []
     iterations = []
@@ -94,18 +98,19 @@ def main():
         #print('Minimum Colors: ' + str(estimate))
 
         while conflicts > 0:
-            # draw_graph(random_graph, pos, iteration)  # edit here to start drawing graphs ******
+            #draw_graph(random_graph, pos, iteration)  # edit here to start drawing graphs ******
             resolve_conflicts(random_graph, g_used_colors, reserve_colors)
             conflicts = detect_conflicts(random_graph)
             iteration += 1
 
+        draw_graph(random_graph, pos, iteration)
         used_colors_lengths.append(len(g_used_colors))
         estimates.append(estimate)
         iterations.append(iteration)
 
-    print('Estimates:   ', estimates)
-    print('Used Colors: ', used_colors_lengths)
-    print('Iterations:  ', iterations)
+    #print('Estimates:   ', estimates)
+    #print('Used Colors: ', used_colors_lengths)
+    #print('Iterations:  ', iterations)
 
     # Calculate averages
     avg_estimate = sum(estimates) / num_graphs
