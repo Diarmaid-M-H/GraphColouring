@@ -1,3 +1,5 @@
+import csv
+
 import networkx as nx
 import random
 import matplotlib.pyplot as plt
@@ -80,36 +82,39 @@ def main():
     best_params = None
     best_fitness = float('inf') # starts with high number, lower is better
 
+    results = {}
+
     for intro_chance in param_grid['colour_introduction_chance']:
         for change_chance in param_grid['colour_change_chance']:
             fitnessList = []
-            iterationList = []
             for original in graphs:
                 graph = original.copy()
                 conflicts = detect_conflicts(graph)
                 iteration = 1
-                pos = nx.spring_layout(graph)
 
                 while conflicts > 0:
-                    # this directly edits graph, need to use graph copy function
                     resolve_conflicts(graph, g_used_colors, reserve_colors, intro_chance, change_chance)
                     conflicts = detect_conflicts(graph)
                     iteration += 1
 
                 fitness = len(g_used_colors) + (0.01 * iteration)
                 fitnessList.append(fitness)
-                iterationList.append(iteration)
 
             avg_fitness = sum(fitnessList) / num_graphs
-            avg_iterations = sum(iterationList) / num_graphs
-            print(avg_fitness, avg_iterations)
-            if avg_fitness < best_fitness:
-                best_fitness = avg_fitness
-                best_params = (intro_chance, change_chance)
+            results[(intro_chance, change_chance)] = avg_fitness
 
-    print('Best intro_chance:', best_params[0])
-    print('Best change_chance:', best_params[1])
-    print('Best fitness (low is better):', best_fitness)
+    # Write results to CSV file
+    with open('grid_search_results.csv', 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        header = [' '] + [f'{intro_chance}' for intro_chance in param_grid['colour_introduction_chance']]
+        writer.writerow(header)
+        for change_chance in param_grid['colour_change_chance']:
+            row = [f'{change_chance}']
+            for intro_chance in param_grid['colour_introduction_chance']:
+                fitness = results.get((intro_chance, change_chance), 'N/A')
+                row.append(fitness)
+            writer.writerow(row)
+
 
 if __name__ == "__main__":
     main()
