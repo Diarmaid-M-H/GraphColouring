@@ -82,22 +82,27 @@ def main():
 
     for intro_chance in param_grid['colour_introduction_chance']:
         for change_chance in param_grid['colour_change_chance']:
-            used_colors_lengths = []
-            for graph in graphs:
+            fitnessList = []
+            iterationList = []
+            for original in graphs:
+                graph = original.copy()
                 conflicts = detect_conflicts(graph)
                 iteration = 1
                 pos = nx.spring_layout(graph)
 
                 while conflicts > 0:
+                    # this directly edits graph, need to use graph copy function
                     resolve_conflicts(graph, g_used_colors, reserve_colors, intro_chance, change_chance)
                     conflicts = detect_conflicts(graph)
                     iteration += 1
 
                 fitness = len(g_used_colors) + (0.01 * iteration)
+                fitnessList.append(fitness)
+                iterationList.append(iteration)
 
-                used_colors_lengths.append(fitness)
-
-            avg_fitness = sum(used_colors_lengths) / num_graphs
+            avg_fitness = sum(fitnessList) / num_graphs
+            avg_iterations = sum(iterationList) / num_graphs
+            print(avg_fitness, avg_iterations)
             if avg_fitness < best_fitness:
                 best_fitness = avg_fitness
                 best_params = (intro_chance, change_chance)
