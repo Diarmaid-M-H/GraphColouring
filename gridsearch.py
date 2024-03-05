@@ -3,7 +3,7 @@ import random
 import matplotlib.pyplot as plt
 
 def generate_connected_random_graph(num_nodes, colors):
-    # Ensure the graph is connected using Watts-Strogatz model
+    # generate a connected small world graph using Watts-Strogatz model
     k = 4  # Number of nearest neighbors for each node in the Watts-Strogatz model
     G = nx.connected_watts_strogatz_graph(num_nodes, k, p=0.1)
 
@@ -52,7 +52,7 @@ def draw_graph(G, pos, iteration):
 
 def main():
     num_nodes = 200
-    num_graphs = 1
+    num_graphs = 5
 
     g_used_colors = ['#fc5185', '#36486b']
     reserve_colors = [
@@ -73,12 +73,12 @@ def main():
 
     # Define parameters to search
     param_grid = {
-        'colour_introduction_chance': [0.001, 0.005, 0.01],
-        'colour_change_chance': [0.1, 0.3, 0.5]
+        'colour_introduction_chance': [0.00001, 0.0001, 0.001, 0.005, 0.01],
+        'colour_change_chance': [0.001, 0.01, 0.1, 0.3, 0.5]
     }
 
     best_params = None
-    best_used_colors_length = float('inf') # starts with high number
+    best_fitness = float('inf') # starts with high number, lower is better
 
     for intro_chance in param_grid['colour_introduction_chance']:
         for change_chance in param_grid['colour_change_chance']:
@@ -93,16 +93,18 @@ def main():
                     conflicts = detect_conflicts(graph)
                     iteration += 1
 
-                used_colors_lengths.append(len(g_used_colors))
+                fitness = len(g_used_colors) + (0.01 * iteration)
 
-            avg_used_colors_length = sum(used_colors_lengths) / num_graphs
-            if avg_used_colors_length < best_used_colors_length:
-                best_used_colors_length = avg_used_colors_length
+                used_colors_lengths.append(fitness)
+
+            avg_fitness = sum(used_colors_lengths) / num_graphs
+            if avg_fitness < best_fitness:
+                best_fitness = avg_fitness
                 best_params = (intro_chance, change_chance)
 
     print('Best intro_chance:', best_params[0])
     print('Best change_chance:', best_params[1])
-    print('Best used colors length:', best_used_colors_length)
+    print('Best fitness (low is better):', best_fitness)
 
 if __name__ == "__main__":
     main()
