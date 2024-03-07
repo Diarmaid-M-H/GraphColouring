@@ -56,8 +56,8 @@ def main():
     num_nodes = 200
     num_graphs = 5
 
-    g_used_colors = ['#fc5185', '#36486b']
-    reserve_colors = [
+    initial_colors = ['#fc5185', '#36486b']
+    initial_reserve_colors = [
         '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd',
         '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf',
         '#1a1a1a', '#ff0000', '#800000', '#ffff00', '#808000',
@@ -71,12 +71,12 @@ def main():
     ]
 
     # Pre-generate graphs
-    graphs = [generate_connected_random_graph(num_nodes, g_used_colors) for _ in range(num_graphs)]
+    graphs = [generate_connected_random_graph(num_nodes, initial_colors) for _ in range(num_graphs)]
 
     # Define parameters to search
     param_grid = {
-        'colour_introduction_chance': [0.00000001, 0.00000001, 0.0000001, 0.000001, 0.00001, 0.0001, 0.0005],
-        'colour_change_chance': [0.1, 0.3, 0.4, 0.5, 0.6, 0.7, 0.9]
+        'colour_introduction_chance': [0.00001, 0.0001, 0.0005],
+        'colour_change_chance': [0.5, 0.6, 0.7]
     }
 
     best_params = None
@@ -88,6 +88,8 @@ def main():
         for change_chance in param_grid['colour_change_chance']:
             fitnessList = []
             for original in graphs:
+                g_used_colors = initial_colors.copy()
+                reserve_colors = initial_reserve_colors.copy()
                 graph = original.copy()
                 conflicts = detect_conflicts(graph)
                 iteration = 1
@@ -98,6 +100,7 @@ def main():
                     iteration += 1
 
                 fitness = len(g_used_colors) + (0.01 * iteration)
+                print(fitness)
                 fitnessList.append(fitness)
 
             avg_fitness = sum(fitnessList) / num_graphs
