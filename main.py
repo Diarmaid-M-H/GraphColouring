@@ -55,7 +55,7 @@ def draw_graph(G, pos, iteration):
     plt.show()
 
 def main():
-    num_nodes = 50
+    num_nodes = 200
     num_graphs = 20
 
     initial_colors = ['#fc5185', '#36486b']
