@@ -84,6 +84,8 @@ def main():
 
     results = {}
 
+    runlen = num_graphs * len(param_grid['colour_introduction_chance']) * len(param_grid['colour_change_chance'])
+    runCount = 0;
     for intro_chance in param_grid['colour_introduction_chance']:
         for change_chance in param_grid['colour_change_chance']:
             fitnessList = []
@@ -100,7 +102,8 @@ def main():
                     iteration += 1
 
                 fitness = len(g_used_colors) + (0.01 * iteration)
-                print(fitness)
+                runCount += 1
+                print('Run: ' + str(runCount) + '/' + str(runlen) + ' Fitness: ' + str(fitness))
                 fitnessList.append(fitness)
 
             avg_fitness = sum(fitnessList) / num_graphs
