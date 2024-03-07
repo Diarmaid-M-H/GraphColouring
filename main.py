@@ -60,10 +60,11 @@ def draw_graph(G, pos, iteration):
     plt.show()
 
 def main():
-    num_nodes = 50
+    num_nodes = 200
     num_edges = 20
-    g_used_colors = ['#fc5185', '#36486b']  # Initial list of colors
-    reserve_colors = [
+
+    initial_colors = ['#fc5185', '#36486b']
+    initial_reserve_colors = [
         '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd',
         '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf',
         '#1a1a1a', '#ff0000', '#800000', '#ffff00', '#808000',
@@ -74,7 +75,7 @@ def main():
         '#fff200', '#00b2ff', '#4a4e4d', '#8a89a6', '#997c6c',
         '#3d4b52', '#5bc0eb', '#fde74c', '#9bc53d', '#c3423f',
         '#f7f4a3', '#36486b', '#3fc1c9'
-    ]  # List of reserve colors
+    ]
 
     num_graphs = 10
     estimates = []
@@ -82,6 +83,8 @@ def main():
     iterations = []
 
     for _ in range(num_graphs):
+        g_used_colors = initial_colors.copy()
+        reserve_colors = initial_reserve_colors.copy()
         random_graph = generate_connected_random_graph(num_nodes, num_edges, g_used_colors)
         conflicts = detect_conflicts(random_graph)
         iteration = 1
