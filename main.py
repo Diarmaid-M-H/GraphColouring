@@ -29,8 +29,6 @@ def detect_conflicts(G):
 def resolve_conflicts(G, g_used_colors, reserve_colors):
     # At start of iteration create copy graph to ensure synchronicity
     copy = G.copy()
-    colour_introduction_chance = 0.001
-    colour_change_chance = 0.5
     for node in G.nodes():
         if G.nodes[node]['flag']:
             neighbor_colors = [copy.nodes[neighbor]['color'] for neighbor in copy.neighbors(node)]
@@ -54,9 +52,13 @@ def draw_graph(G, pos, iteration):
     nx.draw(G, pos, with_labels=True, node_color=[G.nodes[node]['color'] for node in G.nodes()])
     plt.show()
 
+# GLOBAL VARS
+colour_introduction_chance = 0.001
+colour_change_chance = 0.6
 def main():
     num_nodes = 200
     num_graphs = 20
+
 
     initial_colors = ['#fc5185', '#36486b']
     initial_reserve_colors = [
@@ -75,6 +77,7 @@ def main():
     estimates = []
     used_colors_lengths = []
     iterations = []
+
 
     for _ in range(num_graphs):
         g_used_colors = initial_colors.copy()
@@ -112,6 +115,8 @@ def main():
     print('Average Minimum Colors:     ', avg_estimate)
     print('Average Number Used Colors: ', avg_used_colors_length)
     print('Average Iterations:         ', avg_iterations)
+    print('\nIntroduction Chance:        ', colour_introduction_chance)
+    print('Change Chance:              ', colour_change_chance)
 
 
 if __name__ == "__main__":
