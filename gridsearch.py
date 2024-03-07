@@ -75,8 +75,8 @@ def main():
 
     # Define parameters to search
     param_grid = {
-        'colour_introduction_chance': [0.00001, 0.0001, 0.001, 0.005, 0.01],
-        'colour_change_chance': [0.001, 0.01, 0.1, 0.3, 0.5]
+        'colour_introduction_chance': [0.00000001, 0.00000001, 0.0000001, 0.000001, 0.00001, 0.0001, 0.0005],
+        'colour_change_chance': [0.1, 0.3, 0.4, 0.5, 0.6, 0.7, 0.9]
     }
 
     best_params = None
