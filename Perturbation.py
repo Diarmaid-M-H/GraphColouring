@@ -94,6 +94,7 @@ def main():
     estimates = []
     used_colors_lengths = []
     iterations = []
+    p_estimates = []
     p_used_colors_lengths = []
     p_iterations = []
 
@@ -125,6 +126,7 @@ def main():
         # New code for perturbation measurement
         for i in range(100):
             add_random_edge(random_graph)
+        p_estimate = max(nx.greedy_color(random_graph).values()) + 1
 
         conflicts = detect_conflicts(random_graph)
         while conflicts > 0:
@@ -135,12 +137,14 @@ def main():
 
         p_used_colors_lengths.append(len(g_used_colors))
         p_iterations.append(iteration)
+        p_estimates.append(p_estimate)
 
     print('Estimates:   ', estimates)
     print('Used Colors: ', used_colors_lengths)
     print('Iterations:  ', iterations)
 
     print('After Perturbation:')
+    print('Estimates:   ', p_estimates)
     print('Used Colors: ', p_used_colors_lengths)
     print('Iterations:  ', p_iterations)
 
@@ -150,6 +154,7 @@ def main():
     avg_iterations = sum(iterations) / num_graphs
 
     # Perturbation Averages
+    p_avg_estimate = sum(p_estimates) / num_graphs
     p_avg_used_colors_length = sum(p_used_colors_lengths) / num_graphs
     p_avg_iterations = sum(p_iterations) / num_graphs
 
@@ -160,6 +165,7 @@ def main():
     print('Change Chance:              ', colour_change_chance)
 
     print('\nAfter Perturbation:')
+    print('Average Minimum Colors:     ', p_avg_estimate)
     print('Average Number Used Colors: ', p_avg_used_colors_length)
     print('Average Iterations:         ', p_avg_iterations)
 
