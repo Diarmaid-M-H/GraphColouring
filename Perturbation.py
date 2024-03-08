@@ -75,7 +75,7 @@ colour_change_chance = 0.6
 def main():
     num_nodes = 200
     num_graphs = 20
-
+    perturbations = 100
 
     initial_colors = ['#fc5185', '#36486b']
     initial_reserve_colors = [
@@ -124,7 +124,7 @@ def main():
         iterations.append(iteration)
 
         # New code for perturbation measurement
-        for i in range(100):
+        for i in range(perturbations):
             add_random_edge(random_graph)
         p_estimate = max(nx.greedy_color(random_graph).values()) + 1
 
@@ -158,6 +158,7 @@ def main():
     p_avg_used_colors_length = sum(p_used_colors_lengths) / num_graphs
     p_avg_iterations = sum(p_iterations) / num_graphs
 
+    print('\n======================================\n')
     print('Average Minimum Colors:     ', avg_estimate)
     print('Average Number Used Colors: ', avg_used_colors_length)
     print('Average Iterations:         ', avg_iterations)
@@ -165,6 +166,7 @@ def main():
     print('Change Chance:              ', colour_change_chance)
 
     print('\nAfter Perturbation:')
+    print('Perturbations:              ', perturbations)
     print('Average Minimum Colors:     ', p_avg_estimate)
     print('Average Number Used Colors: ', p_avg_used_colors_length)
     print('Average Iterations:         ', p_avg_iterations)
