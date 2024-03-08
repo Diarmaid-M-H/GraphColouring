@@ -94,6 +94,8 @@ def main():
     estimates = []
     used_colors_lengths = []
     iterations = []
+    p_used_colors_lengths = []
+    p_iterations = []
 
 
     for _ in range(num_graphs):
@@ -121,32 +123,45 @@ def main():
         iterations.append(iteration)
 
         # New code for perturbation measurement
-        add_random_edge(random_graph)
+        for i in range(100):
+            add_random_edge(random_graph)
 
+        conflicts = detect_conflicts(random_graph)
         while conflicts > 0:
             #draw_graph(random_graph, pos, iteration)  # edit here to start drawing graphs ******
             resolve_conflicts(random_graph, g_used_colors, reserve_colors)
             conflicts = detect_conflicts(random_graph)
             iteration += 1
 
-        # TODO: after perturbation
-        used_colors_lengths.append(len(g_used_colors))
-        iterations.append(iteration)
+        p_used_colors_lengths.append(len(g_used_colors))
+        p_iterations.append(iteration)
 
     print('Estimates:   ', estimates)
     print('Used Colors: ', used_colors_lengths)
     print('Iterations:  ', iterations)
 
+    print('After Perturbation:')
+    print('Used Colors: ', p_used_colors_lengths)
+    print('Iterations:  ', p_iterations)
+
     # Calculate averages
     avg_estimate = sum(estimates) / num_graphs
     avg_used_colors_length = sum(used_colors_lengths) / num_graphs
     avg_iterations = sum(iterations) / num_graphs
+
+    # Perturbation Averages
+    p_avg_used_colors_length = sum(p_used_colors_lengths) / num_graphs
+    p_avg_iterations = sum(p_iterations) / num_graphs
+
     print('Average Minimum Colors:     ', avg_estimate)
     print('Average Number Used Colors: ', avg_used_colors_length)
     print('Average Iterations:         ', avg_iterations)
     print('\nIntroduction Chance:        ', colour_introduction_chance)
     print('Change Chance:              ', colour_change_chance)
 
+    print('\nAfter Perturbation:')
+    print('Average Number Used Colors: ', p_avg_used_colors_length)
+    print('Average Iterations:         ', p_avg_iterations)
 
 if __name__ == "__main__":
     main()
